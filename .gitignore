@@ -1,0 +1,7 @@
+/lib
+/node_modules
+/test/amd/chai.js
+/test/node_modules
+/*.sublime-workspace
+/debug.log
+/package-lock.json

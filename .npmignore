@@ -1,0 +1,11 @@
+/node_modules
+/scripts
+/src
+/test
+/.babelrc
+/.eslintrc
+/.gitignore
+/debug.log
+/package-lock.json
+/*.sublime-project
+/*.sublime-workspace

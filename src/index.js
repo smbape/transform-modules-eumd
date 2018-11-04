@@ -17,11 +17,27 @@ const buildGlobalExport = template(`
   GLOBAL_TO_ASSIGN = mod.exports;
 `);
 
+const globalFactory = `
+function(_this) {
+  var g;
+  if (typeof window !== "undefined") {
+    g = window;
+  } else if (typeof global !== "undefined") {
+    g = global;
+  } else if (typeof self !== "undefined") {
+    g = self;
+  } else {
+    g = _this;
+  }
+  return g;
+  // eslint-disable-next-line no-invalid-this
+}
+`.trim();
+
 const buildUMDWithoutRequire = template(`
   (function (global, factory) {
     if (typeof define === "function" && define.amd) {
       define(MODULE_NAME, AMD_DEPENDENCIES, function() {
-        // eslint-disable-next-line no-invalid-this
         return factory.apply(global, AMD_ARGUMENTS);
       });
     } else if (typeof exports === "object" && typeof module !== "undefined") {
@@ -35,20 +51,7 @@ const buildUMDWithoutRequire = template(`
     } else {
       GLOBAL_EXPORT
     }
-  })((function(_this) {
-    var g;
-    if (typeof window !== "undefined") {
-      g = window;
-    } else if (typeof global !== "undefined") {
-      g = global;
-    } else if (typeof self !== "undefined") {
-      g = self;
-    } else {
-      g = _this;
-    }
-    return g;
-    // eslint-disable-next-line no-invalid-this
-  })(this), FUNC);
+  })((${ globalFactory })(this), FUNC);
 `);
 
 const umdLoaderFactory = `
@@ -284,7 +287,6 @@ const buildUMDWithRequire = params => template(`
         var args = AMD_ARGUMENTS;
 
         args[0] = umdLoader.amd(args[0], global);
-        // eslint-disable-next-line no-invalid-this
         return factory.apply(global, args);
       });
     } else if (typeof exports === "object" && typeof module !== "undefined") {
@@ -301,20 +303,7 @@ const buildUMDWithRequire = params => template(`
     } else {
       GLOBAL_EXPORT
     }
-  })((function(_this) {
-    var g;
-    if (typeof window !== "undefined") {
-      g = window;
-    } else if (typeof global !== "undefined") {
-      g = global;
-    } else if (typeof self !== "undefined") {
-      g = self;
-    } else {
-      g = _this;
-    }
-    return g;
-    // eslint-disable-next-line no-invalid-this
-  })(this), FUNC, typeof require === "undefined" ? undefined : require, ${ params.UMD_LOADER });
+  })((${ globalFactory })(this), FUNC, typeof require === "undefined" ? undefined : require, ${ params.UMD_LOADER });
 `)(params);
 
 const globalMemberExpression = (t, node) => {
@@ -564,6 +553,8 @@ export default function({types: t}) {
             UMD_LOADER: _umdLoader,
             FUNC: func
           }));
+
+          last.get("expression").get("arguments")[0].get("callee").get("body").get("body")[2].addComment("trailing", "eslint-disable-next-line no-invalid-this", true);
         }
       }
     }

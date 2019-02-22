@@ -19,9 +19,8 @@ module.exports = function(config) {
             options: {
                 sourceMap: 'inline',
                 plugins: [
-                    "add-module-exports",
                     [require("./"), {
-                        strict: false,
+                        addModuleExports: true,
                         allowTopLevelThis: true,
                         explicitExtendedUmd: true
                     }]

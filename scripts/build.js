@@ -1,6 +1,6 @@
 const fs = require("fs");
 const sysPath = require("path");
-const babel = require("babel-core");
+const babel = require("@babel/core");
 const eachOfLimit = require("async/eachOfLimit");
 const waterfall = require("async/waterfall");
 const rimraf = require("rimraf");
@@ -9,8 +9,7 @@ const mkdirp = require("mkdirp");
 const options = {
     "plugins": [
         "add-module-exports",
-        ["transform-es2015-modules-commonjs", { "strict" : true, "allowTopLevelThis": false }],
-        "transform-flow-strip-types",
+        ["@babel/plugin-transform-modules-commonjs", { "strict" : true, "allowTopLevelThis": false }]
     ]
 };
 

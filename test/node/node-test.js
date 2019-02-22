@@ -1,4 +1,4 @@
-const babel = require("babel-core");
+const babel = require("@babel/core");
 const fs = require("fs");
 const sysPath = require("path");
 const rimraf = require("rimraf");
@@ -50,11 +50,10 @@ const spec = () => {
 
 const babelOptions = {
     plugins: [
-        "add-module-exports",
         [require("../../"), {
-            strict: false,
             allowTopLevelThis: true,
-            explicitExtendedUmd: true
+            explicitExtendedUmd: true,
+            addModuleExports: true,
         }]
     ]
 };

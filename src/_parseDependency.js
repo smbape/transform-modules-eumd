@@ -1,36 +1,35 @@
 import _resolveNameArg from "./_resolveNameArg";
+import { parse } from "@babel/parser";
 
-export default (plugin, t, node, amdArg, browserArg, commonArg, _resolveName) => {
-  const dep = node.value;
-
-  if (dep[0] !== "%" || dep[1] !== "{" ) {
+export default (plugin, t, dep, metadata, buildAmdArg, buildBrowserArg, buildCommonJsArg, _resolveName) => {
+  if (!dep.startsWith("%{")) {
     return false;
   }
 
   if (dep[dep.length - 1] !== "}") {
-    throw plugin.file.buildCodeFrameError(node, `Expecting import to end with "}" but got "${ dep[dep.length - 1] }"`, SyntaxError);
+    throw plugin.file.buildCodeFrameError(metadata, `Expecting import to end with "}" but got "${ dep[dep.length - 1] }"`, SyntaxError);
   }
-
-  const index = node.value.indexOf(dep) + 1;
-  const start = node.start + index;
 
   let program;
   try {
-    program = plugin.file.parse(`(${ dep.slice(1) })`).program;
+    program = parse(`(${ dep.slice(1) })`).program;
   } catch (err) {
-    throw plugin.file.buildCodeFrameError(node, err.message, SyntaxError);
+    throw plugin.file.buildCodeFrameError(metadata, err.message, SyntaxError);
   }
 
-  if (node.loc) {
-    Object.assign(program, {
-      start: start + program.start,
-      end: start + program.end
-    });
+  if (metadata.loc) {
+    const index = 1;
+    // const start = metadata.loc.start + index;
 
-    program.loc.start.line += node.loc.start.line - 1;
-    program.loc.start.column += node.loc.start.column + 1 + index; // +1 to be after quote('"')
-    program.loc.end.line += node.loc.start.line - 1;
-    program.loc.end.column += node.loc.start.column + 1 + index; // +1 to be after quote('"')
+    // Object.assign(program, {
+    //   start: start + program.start,
+    //   end: start + program.end
+    // });
+
+    program.loc.start.line += metadata.loc.start.line - 1;
+    program.loc.start.column += metadata.loc.start.column + 1 + index; // +1 to be after quote('"')
+    program.loc.end.line += metadata.loc.start.line - 1;
+    program.loc.end.column += metadata.loc.start.column + 1 + index; // +1 to be after quote('"')
   } else {
     delete program.loc;
   }
@@ -55,26 +54,26 @@ export default (plugin, t, node, amdArg, browserArg, commonArg, _resolveName) =>
 
     switch (name) {
       case "amd":
-        amdArg(arg);
+        buildAmdArg(arg);
         break;
       case "browser":
-        browserArg(arg);
+        buildBrowserArg(arg);
         break;
       case "brunch":
         if (seen[name]) {
-          commonArg("brunch", false);
+          buildCommonJsArg("brunch", false);
         }
-        commonArg(name, arg);
+        buildCommonJsArg(name, arg);
         break;
       case "common":
-        commonArg(name, arg);
+        buildCommonJsArg(name, arg);
         if (seen.brunch === undefined) {
-          commonArg("brunch", arg);
+          buildCommonJsArg("brunch", arg);
           seen.brunch = 1;
         }
         break;
       case "node":
-        commonArg(name, arg);
+        buildCommonJsArg(name, arg);
         break;
       default:
         throw plugin.file.buildCodeFrameError(program, `Unknown environment ${ name }'`, SyntaxError);
@@ -84,19 +83,19 @@ export default (plugin, t, node, amdArg, browserArg, commonArg, _resolveName) =>
   });
 
   if (!seen.amd) {
-    amdArg(t.identifier("undefined"));
+    buildAmdArg(t.identifier("undefined"));
   }
   if (!seen.browser) {
-    browserArg(t.identifier("undefined"));
+    buildBrowserArg(t.identifier("undefined"));
   }
   if (!seen.brunch) {
-    commonArg("brunch", t.identifier("undefined"));
+    buildCommonJsArg("brunch", t.identifier("undefined"));
   }
   if (!seen.common) {
-    commonArg("common", t.identifier("undefined"));
+    buildCommonJsArg("common", t.identifier("undefined"));
   }
   if (!seen.node) {
-    commonArg("node", t.identifier("undefined"));
+    buildCommonJsArg("node", t.identifier("undefined"));
   }
 
   return true;

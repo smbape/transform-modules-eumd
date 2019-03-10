@@ -1,6 +1,6 @@
 {
   "name": "transform-modules-eumd",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Transform ES6 modules to UMD modules with per environment dependencies",
   "main": "lib/index.js",
   "directories": {

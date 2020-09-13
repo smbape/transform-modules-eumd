@@ -66,7 +66,7 @@ describe("node-prebuild", () => {
             },
 
             next => {
-                mkdirp(node_modules, next);
+                mkdirp(node_modules).then(next.bind(null, null), next);
             },
             (made, next) => {
                 explore(umd_modules, (_filename, stats, callback) => {
@@ -99,7 +99,7 @@ describe("node-register", () => {
             },
 
             next => {
-                mkdirp(node_modules, next);
+                mkdirp(node_modules).then(next.bind(null, null), next);
             },
             (made, next) => {
                 explore(umd_modules, (_filename, stats, callback) => {

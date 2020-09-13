@@ -42,6 +42,16 @@ require([ './relative',  'for-all', '!global-for-all', { node: "fs" }], (relativ
 
 ## Options
 
+### resolve
+
+`Object`.
+
+Defines dependency resolution
+
+With `{ resolve: { jquery: "%{ common: '!jQuery', amd: 'jQuery', node: 'cheerio' }" } }`
+
+`import $ from "jquery";` will be treated as `import $ from "%{ common: '!jQuery', amd: 'jQuery', node: 'cheerio' }";`
+
 ### `loose`
 
 `boolean`, defaults to `false`.

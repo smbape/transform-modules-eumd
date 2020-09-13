@@ -21,7 +21,7 @@ waterfall([
         rimraf(lib, next);
     },
     next => {
-        mkdirp(lib, next);
+        mkdirp(lib).then(next.bind(null, null), next);
     },
     (made, next) => {
         fs.readdir(src, next);

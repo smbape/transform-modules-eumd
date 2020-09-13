@@ -1,7 +1,11 @@
 import _resolveNameArg from "./_resolveNameArg";
 import { parse } from "@babel/parser";
 
-export default (plugin, t, dep, metadata, buildAmdArg, buildBrowserArg, buildCommonJsArg, _resolveName) => {
+export default (plugin, t, dep, metadata, buildAmdArg, buildBrowserArg, buildCommonJsArg, _resolveName, opts) => {
+  if (opts.resolve && opts.resolve[dep]) {
+    dep = opts.resolve[dep];
+  }
+
   if (!dep.startsWith("%{")) {
     return false;
   }

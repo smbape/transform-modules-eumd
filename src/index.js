@@ -625,7 +625,7 @@ export default declare((api, options) => {
           }
 
           for (const [source, metadata] of meta.source) {
-            if (!_parseDependency(this, t, source, metadata, buildAmdArg, buildBrowserArg, buildCommonJsArg, _resolveName)) {
+            if (!_parseDependency(this, t, source, metadata, buildAmdArg, buildBrowserArg, buildCommonJsArg, _resolveName, opts)) {
               const arg = _resolveNameArg(_resolveName, t.stringLiteral(source));
               buildAmdArg(arg);
               buildBrowserArg(arg);
